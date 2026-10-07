@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>Sign up: California Christian Educator</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Newsletter Signup">
+<meta name="theme-color" content="#1e7a3c">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon.png">
+<style>
+  :root {
+    --paper: #fbf8f1;
+    --paper-deep: #f1ebdd;
+    --ink: #1e2a24;
+    --ink-soft: #5d675f;
+    --rule: #c9bfa6;
+    --green: #1e7a3c;
+    --green-deep: #165c2d;
+    --gold: #b8860b;
+    --white: #ffffff;
+    --error: #a33a2a;
+    color-scheme: light;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: Georgia, "Times New Roman", serif;
+    padding-block: env(safe-area-inset-top, 0px) env(safe-area-inset-bottom, 0px);
+    padding-inline: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    -webkit-text-size-adjust: 100%;
+  }
+  .sheet {
+    width: 100%;
+    max-width: 680px;
+    margin-block: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+  .masthead {
+    text-align: center;
+    border-top: 4px double var(--ink);
+    border-bottom: 1px solid var(--ink);
+    padding-block: 18px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .masthead .eyebrow {
+    font-family: -apple-system, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 13px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+  .masthead h1 {
+    margin: 0;
+    font-size: clamp(30px, 6vw, 46px);
+    font-weight: 700;
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+  .masthead .tagline {
+    margin: 0;
+    font-style: italic;
+    font-size: 18px;
+    color: var(--ink-soft);
+  }
+  .masthead .promise {
+    margin: 0;
+    font-family: -apple-system, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 15px;
+    color: var(--ink);
+  }
+  form { display: flex; flex-direction: column; gap: 18px; }
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  label {
+    font-family: -apple-system, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+  input[type="text"], input[type="email"] {
+    font: inherit;
+    font-size: 24px;
+    padding: 16px 18px;
+    border: 1.5px solid var(--rule);
+    border-radius: 6px;
+    background: var(--white);
+    color: var(--ink);
+    width: 100%;
+  }
+  input:focus { outline: 3px solid var(--gold); outline-offset: 1px; border-color: var(--gold); }
+  input.bad { border-color: var(--error); }
+  .hint {
+    font-family: -apple-system, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 15px;
+    color: var(--error);
+    min-height: 20px;
+  }
+  .go {
+    font: inherit;
+    font-family: -apple-system, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: var(--white);
+    background: var(--green);
+    border: 0;
+    border-radius: 10px;
+    padding: 24px;
+    width: 100%;
+    cursor: pointer;
+    box-shadow: 0 4px 0 var(--green-deep);
+    margin-top: 6px;
+  }
+  .go:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--green-deep); }
+  .go:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+  .thanks {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding-block: 36px;
+    border: 1.5px solid var(--rule);
+    border-radius: 10px;
+    background: var(--white);
+  }
+  .thanks h2 { margin: 0; font-size: 36px; }
+  .thanks p { margin: 0; font-size: 20px; color: var(--ink-soft); }
+  .thanks button {
+    font: inherit;
+    font-family: -apple-system, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 20px;
+    font-weight: 600;
+    align-self: center;
+    padding: 14px 28px;
+    border-radius: 8px;
+    border: 1.5px solid var(--green);
+    background: var(--white);
+    color: var(--green);
+    margin-top: 10px;
+  }
+  .foot {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    font-family: -apple-system, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 13px;
+    color: var(--ink-soft);
+    border-top: 1px solid var(--rule);
+    padding-top: 10px;
+  }
+  .foot .count { font-variant-numeric: tabular-nums; }
+  .foot button {
+    font: inherit;
+    background: none;
+    border: 0;
+    color: var(--ink-soft);
+    text-decoration: underline;
+    padding: 6px 0;
+    cursor: pointer;
+  }
+  .admin {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    background: var(--paper-deep);
+    border: 1.5px solid var(--rule);
+    border-radius: 10px;
+    padding: 18px;
+    font-family: -apple-system, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  }
+  .admin h3 { margin: 0; font-family: Georgia, serif; font-size: 22px; }
+  .admin textarea {
+    font: 14px/1.4 Menlo, Monaco, monospace;
+    width: 100%;
+    min-height: 180px;
+    padding: 10px;
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    background: var(--white);
+    color: var(--ink);
+  }
+  .admin .row { display: flex; flex-wrap: wrap; gap: 10px; }
+  .admin .row > * { flex: 1 1 140px; }
+  .admin button, .admin a.btn {
+    font: inherit;
+    font-size: 16px;
+    font-weight: 600;
+    text-align: center;
+    text-decoration: none;
+    padding: 12px 14px;
+    border-radius: 8px;
+    border: 1.5px solid var(--ink);
+    background: var(--white);
+    color: var(--ink);
+    cursor: pointer;
+  }
+  .admin button.danger { border-color: var(--error); color: var(--error); }
+  .admin .status { font-size: 14px; color: var(--ink-soft); min-height: 18px; }
+  .admin .offline {
+    font-size: 14px;
+    color: var(--ink-soft);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .thanks { animation: pop 240ms ease-out; }
+    @keyframes pop { from { transform: scale(0.97); opacity: 0.4; } to { transform: none; opacity: 1; } }
+  }
+</style>
+</head>
+<body>
+<main class="sheet">
+  <header class="masthead">
+    <div class="eyebrow">Free monthly newsletter</div>
+    <h1>The California Christian Educator</h1>
+    <p class="tagline">Tips, tricks, and teaching methods for K–12 Christian school teachers</p>
+    <p class="promise">Delivered on the first of every month. No spam, unsubscribe any time.</p>
+  </header>
+
+  <form id="signup" novalidate autocomplete="off">
+    <div class="field">
+      <label for="name">Your name</label>
+      <input type="text" id="name" name="name" autocapitalize="words" autocorrect="off" spellcheck="false" enterkeyhint="next">
+    </div>
+    <div class="field">
+      <label for="school">Your school</label>
+      <input type="text" id="school" name="school" autocapitalize="words" autocorrect="off" spellcheck="false" enterkeyhint="next">
+    </div>
+    <div class="field">
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" inputmode="email" autocapitalize="none" autocorrect="off" spellcheck="false" enterkeyhint="done">
+      <div class="hint" id="hint"></div>
+    </div>
+    <button type="submit" class="go" id="go">Sign me up</button>
+  </form>
+
+  <section class="thanks" id="thanks" hidden>
+    <h2 id="thanks-title">Thank you!</h2>
+    <p>You're on the list. Watch for the first issue on the 1st.</p>
+    <button type="button" id="next">Next person</button>
+  </section>
+
+  <section class="admin" id="admin" hidden>
+    <h3>Signup list (stored on this iPad)</h3>
+    <textarea id="csv" readonly spellcheck="false"></textarea>
+    <div class="row">
+      <button type="button" id="copy">Copy list</button>
+      <a class="btn" id="mail" href="#">Email list to me</a>
+      <button type="button" id="clear" class="danger">Clear list</button>
+    </div>
+    <div class="status" id="status"></div>
+    <div class="offline">Entries live only on this device until you copy or email them. Export at the end of each day.</div>
+  </section>
+
+  <footer class="foot">
+    <span class="count" id="count">0 signed up</span>
+    <button type="button" id="toggle-admin">Export list</button>
+  </footer>
+</main>
+
+<script>
+(function () {
+  var KEY = 'ccen-signups-v1';
+  var MAIL_TO = 'Rocky@wayofescape.com';
+  var form = document.getElementById('signup');
+  var nameEl = document.getElementById('name');
+  var schoolEl = document.getElementById('school');
+  var emailEl = document.getElementById('email');
+  var hint = document.getElementById('hint');
+  var thanks = document.getElementById('thanks');
+  var thanksTitle = document.getElementById('thanks-title');
+  var admin = document.getElementById('admin');
+  var csv = document.getElementById('csv');
+  var status = document.getElementById('status');
+  var count = document.getElementById('count');
+  var mail = document.getElementById('mail');
+  var resetTimer = null;
+  var clearArmed = false;
+
+  function load() {
+    try { return JSON.parse(localStorage.getItem(KEY) || '[]'); } catch (e) { return []; }
+  }
+  function save(list) {
+    try { localStorage.setItem(KEY, JSON.stringify(list)); return true; } catch (e) { return false; }
+  }
+  function q(s) { return '"' + String(s).replace(/"/g, '""') + '"'; }
+  function toCsv(list) {
+    var lines = ['name,school,email,signed_up'];
+    list.forEach(function (r) { lines.push([q(r.name), q(r.school), q(r.email), q(r.at)].join(',')); });
+    return lines.join('\n');
+  }
+  function refresh() {
+    var list = load();
+    count.textContent = list.length + (list.length === 1 ? ' signed up' : ' signed up');
+    csv.value = toCsv(list);
+    var subject = 'California Christian Educator signups (' + list.length + ')';
+    mail.href = 'mailto:' + MAIL_TO + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(csv.value);
+  }
+  function validEmail(s) { return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(s); }
+
+  form.addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    var name = nameEl.value.trim();
+    var school = schoolEl.value.trim();
+    var email = emailEl.value.trim().toLowerCase();
+    [nameEl, schoolEl, emailEl].forEach(function (el) { el.classList.remove('bad'); });
+    hint.textContent = '';
+    if (!name) { nameEl.classList.add('bad'); hint.textContent = 'Please enter your name.'; nameEl.focus(); return; }
+    if (!school) { schoolEl.classList.add('bad'); hint.textContent = 'Please enter your school.'; schoolEl.focus(); return; }
+    if (!validEmail(email)) { emailEl.classList.add('bad'); hint.textContent = 'That email does not look right. Check it and try again.'; emailEl.focus(); return; }
+    var list = load();
+    list.push({ name: name, school: school, email: email, at: new Date().toISOString() });
+    if (!save(list)) { hint.textContent = 'Could not save on this device. Tell Rocky.'; return; }
+    form.reset();
+    emailEl.blur();
+    refresh();
+    thanksTitle.textContent = 'Thank you, ' + name.split(' ')[0] + '!';
+    form.hidden = true;
+    thanks.hidden = false;
+    clearTimeout(resetTimer);
+    resetTimer = setTimeout(backToForm, 6000);
+  });
+
+  function backToForm() {
+    clearTimeout(resetTimer);
+    thanks.hidden = true;
+    form.hidden = false;
+  }
+  document.getElementById('next').addEventListener('click', backToForm);
+
+  document.getElementById('toggle-admin').addEventListener('click', function () {
+    admin.hidden = !admin.hidden;
+    status.textContent = '';
+    clearArmed = false;
+    document.getElementById('clear').textContent = 'Clear list';
+    if (!admin.hidden) { refresh(); admin.scrollIntoView({ block: 'nearest' }); }
+  });
+
+  document.getElementById('copy').addEventListener('click', function () {
+    var text = csv.value;
+    var done = function () { status.textContent = 'Copied ' + load().length + ' rows. Paste into Numbers, Excel, or an email.'; };
+    var fallback = function () { csv.focus(); csv.select(); status.textContent = 'Text selected. Tap Copy.'; };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done, fallback);
+    } else { fallback(); }
+  });
+
+  document.getElementById('clear').addEventListener('click', function () {
+    var btn = this;
+    if (!clearArmed) {
+      clearArmed = true;
+      btn.textContent = 'Tap again to erase ' + load().length + ' rows';
+      status.textContent = 'Copy or email the list first. This cannot be undone.';
+      return;
+    }
+    save([]);
+    clearArmed = false;
+    btn.textContent = 'Clear list';
+    status.textContent = 'List cleared.';
+    refresh();
+  });
+
+  refresh();
+
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').catch(function () {});
+  }
+})();
+</script>
+</body>
+</html>
