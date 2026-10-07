@@ -1,5 +1,5 @@
 // Caches the signup page so it opens with no internet once it has loaded once.
-var CACHE = 'ccen-signup-v1';
+var CACHE = 'ccen-signup-v2';
 var FILES = ['./', './index.html', './manifest.json', './icon.png', './sw.js'];
 
 self.addEventListener('install', function (e) {
