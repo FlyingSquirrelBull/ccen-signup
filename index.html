@@ -216,6 +216,76 @@
     font-size: 14px;
     color: var(--ink-soft);
   }
+  /* Multi-select dropdowns */
+  .dd { position: relative; }
+  .dd-btn {
+    font: inherit;
+    font-size: 22px;
+    text-align: left;
+    width: 100%;
+    padding: 16px 48px 16px 18px;
+    border: 1.5px solid var(--rule);
+    border-radius: 6px;
+    background: var(--white);
+    color: var(--ink);
+    cursor: pointer;
+    position: relative;
+  }
+  .dd-btn.empty { color: var(--ink-soft); }
+  .dd-btn.bad { border-color: var(--error); }
+  .dd-btn::after {
+    content: "";
+    position: absolute;
+    right: 18px;
+    top: 50%;
+    width: 12px;
+    height: 12px;
+    border-right: 2.5px solid var(--ink-soft);
+    border-bottom: 2.5px solid var(--ink-soft);
+    transform: translateY(-70%) rotate(45deg);
+  }
+  .dd.open .dd-btn { border-color: var(--gold); border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
+  .dd.open .dd-btn::after { transform: translateY(-20%) rotate(225deg); }
+  .dd-panel {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 14px;
+    border: 1.5px solid var(--gold);
+    border-top: 0;
+    border-radius: 0 0 6px 6px;
+    background: var(--white);
+  }
+  .dd-panel .all { flex-basis: 100%; }
+  .chip {
+    font: inherit;
+    font-family: -apple-system, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    padding: 12px 18px;
+    min-width: 64px;
+    border-radius: 999px;
+    border: 1.5px solid var(--rule);
+    background: var(--paper);
+    color: var(--ink);
+    cursor: pointer;
+  }
+  .chip.on { background: var(--green); border-color: var(--green); color: var(--white); }
+  .chip.all { border-style: dashed; }
+  .chip.all.on { border-style: solid; }
+  .dd-done {
+    font: inherit;
+    font-family: -apple-system, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    margin-left: auto;
+    padding: 12px 22px;
+    border-radius: 8px;
+    border: 1.5px solid var(--ink);
+    background: var(--white);
+    color: var(--ink);
+    cursor: pointer;
+  }
   @media (prefers-reduced-motion: no-preference) {
     .thanks { animation: pop 240ms ease-out; }
     @keyframes pop { from { transform: scale(0.97); opacity: 0.4; } to { transform: none; opacity: 1; } }
@@ -239,6 +309,20 @@
     <div class="field">
       <label for="school">Your school</label>
       <input type="text" id="school" name="school" autocapitalize="words" autocorrect="off" spellcheck="false" enterkeyhint="next">
+    </div>
+    <div class="field">
+      <label id="grades-label">Grade(s) you teach</label>
+      <div class="dd" id="dd-grades">
+        <button type="button" class="dd-btn empty" id="grades-btn" aria-haspopup="true" aria-expanded="false" aria-labelledby="grades-label grades-btn">Choose one or more</button>
+        <div class="dd-panel" id="grades-panel" hidden></div>
+      </div>
+    </div>
+    <div class="field">
+      <label id="subjects-label">Subject(s) you teach</label>
+      <div class="dd" id="dd-subjects">
+        <button type="button" class="dd-btn empty" id="subjects-btn" aria-haspopup="true" aria-expanded="false" aria-labelledby="subjects-label subjects-btn">Choose one or more</button>
+        <div class="dd-panel" id="subjects-panel" hidden></div>
+      </div>
     </div>
     <div class="field">
       <label for="email">Email</label>
@@ -297,12 +381,78 @@
   function save(list) {
     try { localStorage.setItem(KEY, JSON.stringify(list)); return true; } catch (e) { return false; }
   }
-  function q(s) { return '"' + String(s).replace(/"/g, '""') + '"'; }
+  function q(s) { return '"' + String(s == null ? '' : s).replace(/"/g, '""') + '"'; }
   function toCsv(list) {
-    var lines = ['name,school,email,signed_up'];
-    list.forEach(function (r) { lines.push([q(r.name), q(r.school), q(r.email), q(r.at)].join(',')); });
+    var lines = ['name,school,grades,subjects,email,signed_up'];
+    list.forEach(function (r) {
+      lines.push([q(r.name), q(r.school), q((r.grades || []).join('; ')), q((r.subjects || []).join('; ')), q(r.email), q(r.at)].join(','));
+    });
     return lines.join('\n');
   }
+
+  // Multi-select dropdowns. "All" sits at the top and toggles every option.
+  var GRADES = ['K', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'];
+  var SUBJECTS = ['Bible', 'Reading / Phonics', 'Language Arts', 'Spelling / Handwriting', 'Math', 'Science', 'History / Social Studies', 'Art', 'Music', 'PE', 'Computer / Technology', 'Foreign Language', 'Electives', 'Administration'];
+
+  function makeDropdown(id, options, allLabel, summaryWord) {
+    var root = document.getElementById('dd-' + id);
+    var btn = document.getElementById(id + '-btn');
+    var panel = document.getElementById(id + '-panel');
+    var chips = [];
+    var allChip = document.createElement('button');
+    allChip.type = 'button';
+    allChip.className = 'chip all';
+    allChip.textContent = allLabel;
+    allChip.addEventListener('click', function () {
+      var turnOn = !allChip.classList.contains('on');
+      chips.forEach(function (c) { c.classList.toggle('on', turnOn); });
+      sync();
+    });
+    var allWrap = document.createElement('div');
+    allWrap.className = 'all';
+    allWrap.appendChild(allChip);
+    panel.appendChild(allWrap);
+    options.forEach(function (o) {
+      var c = document.createElement('button');
+      c.type = 'button';
+      c.className = 'chip';
+      c.textContent = o;
+      c.setAttribute('data-value', o);
+      c.addEventListener('click', function () { c.classList.toggle('on'); sync(); });
+      panel.appendChild(c);
+      chips.push(c);
+    });
+    var done = document.createElement('button');
+    done.type = 'button';
+    done.className = 'dd-done';
+    done.textContent = 'Done';
+    done.addEventListener('click', function () { close(); });
+    panel.appendChild(done);
+
+    function selected() {
+      return chips.filter(function (c) { return c.classList.contains('on'); }).map(function (c) { return c.getAttribute('data-value'); });
+    }
+    function sync() {
+      var sel = selected();
+      allChip.classList.toggle('on', sel.length === options.length);
+      btn.classList.remove('bad');
+      if (sel.length === 0) { btn.textContent = 'Choose one or more'; btn.classList.add('empty'); }
+      else if (sel.length === options.length) { btn.textContent = allLabel; btn.classList.remove('empty'); }
+      else { btn.textContent = (summaryWord ? summaryWord + ' ' : '') + sel.join(', '); btn.classList.remove('empty'); }
+    }
+    function open() { panel.hidden = false; root.classList.add('open'); btn.setAttribute('aria-expanded', 'true'); }
+    function close() { panel.hidden = true; root.classList.remove('open'); btn.setAttribute('aria-expanded', 'false'); }
+    btn.addEventListener('click', function () { if (panel.hidden) { open(); } else { close(); } });
+
+    return {
+      values: selected,
+      reset: function () { chips.forEach(function (c) { c.classList.remove('on'); }); close(); sync(); },
+      markBad: function () { btn.classList.add('bad'); open(); btn.scrollIntoView({ block: 'center' }); },
+      close: close
+    };
+  }
+  var gradesDd = makeDropdown('grades', GRADES, 'All grades, K–12', 'Grades');
+  var subjectsDd = makeDropdown('subjects', SUBJECTS, 'All subjects', '');
   function refresh() {
     var list = load();
     count.textContent = list.length + (list.length === 1 ? ' signed up' : ' signed up');
@@ -321,11 +471,17 @@
     hint.textContent = '';
     if (!name) { nameEl.classList.add('bad'); hint.textContent = 'Please enter your name.'; nameEl.focus(); return; }
     if (!school) { schoolEl.classList.add('bad'); hint.textContent = 'Please enter your school.'; schoolEl.focus(); return; }
+    var grades = gradesDd.values();
+    var subjects = subjectsDd.values();
+    if (grades.length === 0) { hint.textContent = 'Please choose at least one grade.'; gradesDd.markBad(); return; }
+    if (subjects.length === 0) { hint.textContent = 'Please choose at least one subject.'; subjectsDd.markBad(); return; }
     if (!validEmail(email)) { emailEl.classList.add('bad'); hint.textContent = 'That email does not look right. Check it and try again.'; emailEl.focus(); return; }
     var list = load();
-    list.push({ name: name, school: school, email: email, at: new Date().toISOString() });
+    list.push({ name: name, school: school, grades: grades, subjects: subjects, email: email, at: new Date().toISOString() });
     if (!save(list)) { hint.textContent = 'Could not save on this device. Tell Rocky.'; return; }
     form.reset();
+    gradesDd.reset();
+    subjectsDd.reset();
     emailEl.blur();
     refresh();
     thanksTitle.textContent = 'Thank you, ' + name.split(' ')[0] + '!';
