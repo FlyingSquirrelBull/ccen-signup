@@ -165,6 +165,7 @@
     padding-top: 10px;
   }
   .foot .count { font-variant-numeric: tabular-nums; }
+  .foot .sync { font-variant-numeric: tabular-nums; flex: 1 1 auto; text-align: center; }
   .foot button {
     font: inherit;
     background: none;
@@ -390,6 +391,7 @@
 
   <footer class="foot">
     <span class="count" id="count">0 signed up</span>
+    <span class="sync" id="sync"></span>
     <button type="button" id="toggle-admin">Export list</button>
   </footer>
 </main>
@@ -397,6 +399,10 @@
 <script>
 (function () {
   var KEY = 'ccen-signups-v1';
+  // Auto-sync: whenever this device has a connection, unsent entries are posted to seekingtoserve.com,
+  // which drops them into the same subscriber table the online form uses. The local copy is kept.
+  var SYNC_URL = 'https://seekingtoserve.com/api/kiosk-signups';
+  var syncing = false;
   var MAIL_TO = 'Rocky@wayofescape.com';
   var form = document.getElementById('signup');
   var nameEl = document.getElementById('name');
@@ -501,6 +507,33 @@
     var subject = 'California Christian Educator signups (' + list.length + ')';
     mail.href = 'mailto:' + MAIL_TO + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(csv.value);
   }
+  function syncStatus(msg) { var el = document.getElementById('sync'); if (el) el.textContent = msg || ''; }
+  function sync() {
+    if (syncing) return;
+    var list = load();
+    var pending = list.filter(function (r) { return !r.synced; });
+    if (pending.length === 0) { syncStatus(list.length ? 'All sent to seekingtoserve.com' : ''); return; }
+    if (!navigator.onLine) { syncStatus(pending.length + ' waiting to send (offline)'); return; }
+    syncing = true;
+    syncStatus('Sending ' + pending.length + '\u2026');
+    var body = { source: 'ipad-kiosk', entries: pending.map(function (r) {
+      return { name: r.name, school: r.school, grades: r.grades || [], subjects: r.subjects || [], email: r.email, signed_up: r.at };
+    }) };
+    fetch(SYNC_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+      .then(function (res) { if (!res.ok) throw new Error('HTTP ' + res.status); return res.json(); })
+      .then(function () {
+        var now = load();
+        var sentKeys = {};
+        pending.forEach(function (r) { sentKeys[r.email + '|' + r.at] = true; });
+        now.forEach(function (r) { if (sentKeys[r.email + '|' + r.at]) r.synced = true; });
+        save(now);
+        syncStatus('All sent to seekingtoserve.com');
+      })
+      .catch(function () { syncStatus(pending.length + ' waiting to send'); })
+      .then(function () { syncing = false; });
+  }
+  window.addEventListener('online', sync);
+  setInterval(sync, 5 * 60 * 1000);
   function validEmail(s) { return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(s); }
 
   form.addEventListener('submit', function (ev) {
@@ -521,6 +554,7 @@
     list.push({ name: name, school: school, grades: grades, subjects: subjects, email: email, at: new Date().toISOString() });
     if (!save(list)) { hint.textContent = 'Could not save on this device. Tell Rocky.'; return; }
     form.reset();
+    sync();
     gradesDd.reset();
     subjectsDd.reset();
     emailEl.blur();
@@ -581,6 +615,7 @@
   });
 
   refresh();
+  sync();
 
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js').catch(function () {});
