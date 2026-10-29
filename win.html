@@ -8,20 +8,21 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Register to Win">
-<meta name="theme-color" content="#1e7a3c">
+<meta name="theme-color" content="#93328e">
 <link rel="manifest" href="win-manifest.json">
 <link rel="apple-touch-icon" href="icon.png">
 <style>
   :root {
-    --paper: #fbf8f1;
-    --paper-deep: #f1ebdd;
-    --ink: #1e2a24;
-    --ink-soft: #5d675f;
-    --rule: #c9bfa6;
-    --green: #1e7a3c;
-    --green-deep: #165c2d;
-    --gold: #b8860b;
-    --gold-soft: #f3e3b3;
+    /* Abeka brand: purple + sky blue (from abeka.com stylesheets) */
+    --paper: #f7f7f9;
+    --paper-deep: #ededf2;
+    --ink: #1c1c1c;
+    --ink-soft: #595959;
+    --rule: #c9c4d2;
+    --green: #93328e;
+    --green-deep: #6d2077;
+    --gold: #4bc1eb;
+    --gold-soft: #d9f1fa;
     --white: #ffffff;
     --error: #a33a2a;
     color-scheme: light;
@@ -32,7 +33,7 @@
   body {
     background: var(--paper);
     color: var(--ink);
-    font-family: Georgia, "Times New Roman", serif;
+    font-family: -apple-system, "Helvetica Neue", Helvetica, Arial, sans-serif;
     padding-block: env(safe-area-inset-top, 0px) env(safe-area-inset-bottom, 0px);
     padding-inline: 16px;
     display: flex;
@@ -92,7 +93,7 @@
     text-align: center; display: flex; flex-direction: column; gap: 14px; padding: 36px 20px;
     border: 3px solid var(--green); border-radius: 14px; background: var(--white);
   }
-  .thanks h2 { margin: 0; font-size: 40px; }
+  .thanks h2 { margin: 0; font-size: 40px; color: var(--green); }
   .thanks p { margin: 0; font-size: 22px; color: var(--ink); }
   .thanks .gift { font-family: -apple-system, "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 24px; font-weight: 800; color: var(--green); background: var(--gold-soft); border-radius: 10px; padding: 14px; }
   .thanks button {
@@ -110,7 +111,7 @@
     display: flex; flex-direction: column; gap: 14px; background: var(--paper-deep); border: 1.5px solid var(--rule); border-radius: 10px; padding: 18px;
     font-family: -apple-system, "Helvetica Neue", Helvetica, Arial, sans-serif;
   }
-  .admin h3 { margin: 0; font-family: Georgia, serif; font-size: 22px; }
+  .admin h3 { margin: 0; font-size: 22px; }
   .admin textarea { font: 14px/1.4 Menlo, Monaco, monospace; width: 100%; min-height: 160px; padding: 10px; border: 1px solid var(--rule); border-radius: 6px; background: var(--white); color: var(--ink); }
   .admin .row { display: flex; flex-wrap: wrap; gap: 10px; }
   .admin .row > * { flex: 1 1 140px; }
@@ -121,7 +122,7 @@
   .admin button.danger { border-color: var(--error); color: var(--error); }
   .admin button.win { border-color: var(--gold); background: var(--gold-soft); }
   .admin .status { font-size: 15px; color: var(--ink); min-height: 18px; }
-  .admin .winner { font-family: Georgia, serif; font-size: 26px; text-align: center; padding: 10px; }
+  .admin .winner { font-size: 26px; font-weight: 700; color: var(--green); text-align: center; padding: 10px; }
   /* grade chips */
   .dd { position: relative; }
   .dd-btn {
