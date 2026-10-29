@@ -1,0 +1,399 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>Register to Win: Classroom Supply Kit</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Register to Win">
+<meta name="theme-color" content="#1e7a3c">
+<link rel="manifest" href="win-manifest.json">
+<link rel="apple-touch-icon" href="icon.png">
+<style>
+  :root {
+    --paper: #fbf8f1;
+    --paper-deep: #f1ebdd;
+    --ink: #1e2a24;
+    --ink-soft: #5d675f;
+    --rule: #c9bfa6;
+    --green: #1e7a3c;
+    --green-deep: #165c2d;
+    --gold: #b8860b;
+    --gold-soft: #f3e3b3;
+    --white: #ffffff;
+    --error: #a33a2a;
+    color-scheme: light;
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: Georgia, "Times New Roman", serif;
+    padding-block: env(safe-area-inset-top, 0px) env(safe-area-inset-bottom, 0px);
+    padding-inline: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    -webkit-text-size-adjust: 100%;
+  }
+  .sheet { width: 100%; max-width: 680px; margin-block: auto; display: flex; flex-direction: column; gap: 22px; padding-block: 14px; }
+  .banner {
+    text-align: center;
+    background: var(--green);
+    color: var(--white);
+    border-radius: 14px;
+    padding: 22px 18px 20px;
+    box-shadow: 0 6px 0 var(--green-deep);
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .banner .eyebrow {
+    font-family: -apple-system, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 15px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--gold-soft);
+  }
+  .banner h1 {
+    margin: 0; font-family: -apple-system, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: clamp(40px, 9vw, 64px); font-weight: 900; line-height: 1; letter-spacing: 0.02em; text-transform: uppercase;
+  }
+  .banner .prize { margin: 6px 0 0; font-size: clamp(22px, 4.5vw, 30px); font-style: italic; }
+  .banner .prize b { font-style: normal; color: var(--gold-soft); }
+  .everyone {
+    text-align: center; background: var(--gold-soft); border: 2px dashed var(--gold); border-radius: 10px;
+    padding: 12px 16px; font-family: -apple-system, "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 20px; font-weight: 700;
+  }
+  .everyone small { display: block; font-weight: 400; font-size: 15px; color: var(--ink-soft); margin-top: 4px; }
+  form { display: flex; flex-direction: column; gap: 16px; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 480px) { .row2 { grid-template-columns: 1fr; } }
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  label {
+    font-family: -apple-system, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 14px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-soft);
+  }
+  input[type="text"], input[type="email"] {
+    font: inherit; font-size: 24px; padding: 14px 18px; border: 1.5px solid var(--rule); border-radius: 6px;
+    background: var(--white); color: var(--ink); width: 100%;
+  }
+  input:focus { outline: 3px solid var(--gold); outline-offset: 1px; border-color: var(--gold); }
+  input.bad { border-color: var(--error); }
+  .hint { font-family: -apple-system, "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 15px; color: var(--error); min-height: 20px; }
+  .go {
+    font: inherit; font-family: -apple-system, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 30px; font-weight: 800; letter-spacing: 0.03em; text-transform: uppercase; color: var(--white);
+    background: var(--green); border: 0; border-radius: 12px; padding: 24px; width: 100%; cursor: pointer;
+    box-shadow: 0 5px 0 var(--green-deep); margin-top: 4px;
+  }
+  .go:active { transform: translateY(3px); box-shadow: 0 2px 0 var(--green-deep); }
+  .fine { font-family: -apple-system, "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 14px; color: var(--ink-soft); text-align: center; margin: 0; }
+  .thanks {
+    text-align: center; display: flex; flex-direction: column; gap: 14px; padding: 36px 20px;
+    border: 3px solid var(--green); border-radius: 14px; background: var(--white);
+  }
+  .thanks h2 { margin: 0; font-size: 40px; }
+  .thanks p { margin: 0; font-size: 22px; color: var(--ink); }
+  .thanks .gift { font-family: -apple-system, "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 24px; font-weight: 800; color: var(--green); background: var(--gold-soft); border-radius: 10px; padding: 14px; }
+  .thanks button {
+    font: inherit; font-family: -apple-system, "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 20px; font-weight: 600;
+    align-self: center; padding: 14px 28px; border-radius: 8px; border: 1.5px solid var(--green); background: var(--white); color: var(--green); margin-top: 6px;
+  }
+  .foot {
+    display: flex; justify-content: space-between; align-items: baseline; gap: 12px;
+    font-family: -apple-system, "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 13px; color: var(--ink-soft);
+    border-top: 1px solid var(--rule); padding-top: 10px;
+  }
+  .foot .sync { flex: 1 1 auto; text-align: center; }
+  .foot button { font: inherit; background: none; border: 0; color: var(--ink-soft); text-decoration: underline; padding: 6px 0; cursor: pointer; }
+  .admin {
+    display: flex; flex-direction: column; gap: 14px; background: var(--paper-deep); border: 1.5px solid var(--rule); border-radius: 10px; padding: 18px;
+    font-family: -apple-system, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  }
+  .admin h3 { margin: 0; font-family: Georgia, serif; font-size: 22px; }
+  .admin textarea { font: 14px/1.4 Menlo, Monaco, monospace; width: 100%; min-height: 160px; padding: 10px; border: 1px solid var(--rule); border-radius: 6px; background: var(--white); color: var(--ink); }
+  .admin .row { display: flex; flex-wrap: wrap; gap: 10px; }
+  .admin .row > * { flex: 1 1 140px; }
+  .admin button, .admin a.btn {
+    font: inherit; font-size: 16px; font-weight: 600; text-align: center; text-decoration: none; padding: 12px 14px;
+    border-radius: 8px; border: 1.5px solid var(--ink); background: var(--white); color: var(--ink); cursor: pointer;
+  }
+  .admin button.danger { border-color: var(--error); color: var(--error); }
+  .admin button.win { border-color: var(--gold); background: var(--gold-soft); }
+  .admin .status { font-size: 15px; color: var(--ink); min-height: 18px; }
+  .admin .winner { font-family: Georgia, serif; font-size: 26px; text-align: center; padding: 10px; }
+  /* grade chips */
+  .dd { position: relative; }
+  .dd-btn {
+    font: inherit; font-size: 22px; text-align: left; width: 100%; padding: 14px 48px 14px 18px; border: 1.5px solid var(--rule);
+    border-radius: 6px; background: var(--white); color: var(--ink); cursor: pointer; position: relative;
+  }
+  .dd-btn.empty { color: var(--ink-soft); }
+  .dd-btn.bad { border-color: var(--error); }
+  .dd-btn::after { content: ""; position: absolute; right: 18px; top: 50%; width: 12px; height: 12px; border-right: 2.5px solid var(--ink-soft); border-bottom: 2.5px solid var(--ink-soft); transform: translateY(-70%) rotate(45deg); }
+  .dd.open .dd-btn { border-color: var(--gold); border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
+  .dd.open .dd-btn::after { transform: translateY(-20%) rotate(225deg); }
+  .dd-panel { display: flex; flex-wrap: wrap; gap: 10px; padding: 14px; border: 1.5px solid var(--gold); border-top: 0; border-radius: 0 0 6px 6px; background: var(--white); }
+  .dd-panel .all { flex-basis: 100%; }
+  .chip { font: inherit; font-family: -apple-system, "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 600; padding: 12px 18px; min-width: 64px; border-radius: 999px; border: 1.5px solid var(--rule); background: var(--paper); color: var(--ink); cursor: pointer; }
+  .chip.on { background: var(--green); border-color: var(--green); color: var(--white); }
+  .chip.all { border-style: dashed; }
+  .chip.all.on { border-style: solid; }
+  .dd-done { font: inherit; font-family: -apple-system, "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 600; margin-left: auto; padding: 12px 22px; border-radius: 8px; border: 1.5px solid var(--ink); background: var(--white); color: var(--ink); cursor: pointer; }
+  @media (prefers-reduced-motion: no-preference) {
+    .thanks { animation: pop 240ms ease-out; }
+    @keyframes pop { from { transform: scale(0.97); opacity: 0.4; } to { transform: none; opacity: 1; } }
+  }
+</style>
+</head>
+<body>
+<main class="sheet">
+  <header class="banner">
+    <div class="eyebrow">Abeka · The California Christian Educator</div>
+    <h1>Register to Win</h1>
+    <p class="prize">a <b>Classroom Supply Kit</b> for your room</p>
+  </header>
+  <div class="everyone">Everyone who enters receives a free gift!<small>Enter below, then show the screen at the booth to pick up your gift.</small></div>
+
+  <form id="entry" novalidate autocomplete="off">
+    <div class="row2">
+      <div class="field">
+        <label for="first">First name</label>
+        <input type="text" id="first" autocapitalize="words" autocorrect="off" spellcheck="false" enterkeyhint="next">
+      </div>
+      <div class="field">
+        <label for="last">Last name</label>
+        <input type="text" id="last" autocapitalize="words" autocorrect="off" spellcheck="false" enterkeyhint="next">
+      </div>
+    </div>
+    <div class="field">
+      <label for="school">School where you teach</label>
+      <input type="text" id="school" autocapitalize="words" autocorrect="off" spellcheck="false" enterkeyhint="next">
+    </div>
+    <div class="field">
+      <label for="city">City the school is in</label>
+      <input type="text" id="city" autocapitalize="words" autocorrect="off" spellcheck="false" enterkeyhint="next">
+    </div>
+    <div class="field">
+      <label id="grades-label">Grade(s) you teach</label>
+      <div class="dd" id="dd-grades">
+        <button type="button" class="dd-btn empty" id="grades-btn" aria-haspopup="true" aria-expanded="false" aria-labelledby="grades-label grades-btn">Choose one or more</button>
+        <div class="dd-panel" id="grades-panel" hidden></div>
+      </div>
+    </div>
+    <div class="field">
+      <label for="email">Email (so we can reach the winner)</label>
+      <input type="email" id="email" inputmode="email" autocapitalize="none" autocorrect="off" spellcheck="false" enterkeyhint="done">
+      <div class="hint" id="hint"></div>
+    </div>
+    <button type="submit" class="go" id="go">Enter me to win</button>
+    <p class="fine">Entering also signs you up for The California Christian Educator, a free monthly newsletter for Christian school teachers. Unsubscribe any time.</p>
+  </form>
+
+  <section class="thanks" id="thanks" hidden>
+    <h2 id="thanks-title">You're entered!</h2>
+    <p>Good luck in the drawing for the Classroom Supply Kit.</p>
+    <div class="gift">Show this screen to pick up your free gift 🎁</div>
+    <button type="button" id="next">Next person</button>
+  </section>
+
+  <section class="admin" id="admin" hidden>
+    <h3>Entries (stored on this iPad)</h3>
+    <textarea id="csv" readonly spellcheck="false"></textarea>
+    <div class="row">
+      <button type="button" id="copy">Copy list</button>
+      <a class="btn" id="mail" href="#">Email list to me</a>
+      <button type="button" id="draw" class="win">Draw a winner</button>
+      <button type="button" id="clear" class="danger">Clear list</button>
+    </div>
+    <div class="winner" id="winner"></div>
+    <div class="status" id="status"></div>
+  </section>
+
+  <footer class="foot">
+    <span class="count" id="count">0 entered</span>
+    <span class="sync" id="sync"></span>
+    <button type="button" id="toggle-admin">Export entries</button>
+  </footer>
+</main>
+
+<script>
+(function () {
+  var KEY = 'ccen-win-v1';
+  var EVENT = 'Oregon convention, Oct 2026';
+  // Same endpoint as the newsletter kiosk: entries land in the seekingtoserve.com subscriber table.
+  // That API takes name/school/grades/subjects/email, so first+last are joined and the city rides
+  // along with the school; the full fields stay in this device's CSV export.
+  var SYNC_URL = 'https://seekingtoserve.com/api/kiosk-signups';
+  var MAIL_TO = 'Rocky@wayofescape.com';
+  var syncing = false;
+  var form = document.getElementById('entry');
+  var firstEl = document.getElementById('first');
+  var lastEl = document.getElementById('last');
+  var schoolEl = document.getElementById('school');
+  var cityEl = document.getElementById('city');
+  var emailEl = document.getElementById('email');
+  var hint = document.getElementById('hint');
+  var thanks = document.getElementById('thanks');
+  var thanksTitle = document.getElementById('thanks-title');
+  var admin = document.getElementById('admin');
+  var csv = document.getElementById('csv');
+  var status = document.getElementById('status');
+  var count = document.getElementById('count');
+  var mail = document.getElementById('mail');
+  var resetTimer = null;
+  var clearArmed = false;
+
+  function load() { try { return JSON.parse(localStorage.getItem(KEY) || '[]'); } catch (e) { return []; } }
+  function save(list) { try { localStorage.setItem(KEY, JSON.stringify(list)); return true; } catch (e) { return false; } }
+  function q(s) { return '"' + String(s == null ? '' : s).replace(/"/g, '""') + '"'; }
+  function toCsv(list) {
+    var lines = ['first_name,last_name,school,city,grades,email,entered,event'];
+    list.forEach(function (r) {
+      lines.push([q(r.first), q(r.last), q(r.school), q(r.city), q((r.grades || []).join('; ')), q(r.email), q(r.at), q(r.event)].join(','));
+    });
+    return lines.join('\n');
+  }
+
+  var GRADES = ['K', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'];
+  function makeDropdown(id, options, allLabel, summaryWord) {
+    var root = document.getElementById('dd-' + id);
+    var btn = document.getElementById(id + '-btn');
+    var panel = document.getElementById(id + '-panel');
+    var chips = [];
+    var allChip = document.createElement('button');
+    allChip.type = 'button'; allChip.className = 'chip all'; allChip.textContent = allLabel;
+    allChip.addEventListener('click', function () {
+      var turnOn = !allChip.classList.contains('on');
+      chips.forEach(function (c) { c.classList.toggle('on', turnOn); });
+      syncBtn();
+    });
+    var allWrap = document.createElement('div'); allWrap.className = 'all'; allWrap.appendChild(allChip); panel.appendChild(allWrap);
+    options.forEach(function (o) {
+      var c = document.createElement('button');
+      c.type = 'button'; c.className = 'chip'; c.textContent = o; c.setAttribute('data-value', o);
+      c.addEventListener('click', function () { c.classList.toggle('on'); syncBtn(); });
+      panel.appendChild(c); chips.push(c);
+    });
+    var done = document.createElement('button');
+    done.type = 'button'; done.className = 'dd-done'; done.textContent = 'Done';
+    done.addEventListener('click', function () { close(); });
+    panel.appendChild(done);
+    function selected() { return chips.filter(function (c) { return c.classList.contains('on'); }).map(function (c) { return c.getAttribute('data-value'); }); }
+    function syncBtn() {
+      var sel = selected();
+      allChip.classList.toggle('on', sel.length === options.length);
+      btn.classList.remove('bad');
+      if (sel.length === 0) { btn.textContent = 'Choose one or more'; btn.classList.add('empty'); }
+      else if (sel.length === options.length) { btn.textContent = allLabel; btn.classList.remove('empty'); }
+      else { btn.textContent = (summaryWord ? summaryWord + ' ' : '') + sel.join(', '); btn.classList.remove('empty'); }
+    }
+    function open() { panel.hidden = false; root.classList.add('open'); btn.setAttribute('aria-expanded', 'true'); }
+    function close() { panel.hidden = true; root.classList.remove('open'); btn.setAttribute('aria-expanded', 'false'); }
+    btn.addEventListener('click', function () { if (panel.hidden) { open(); } else { close(); } });
+    return {
+      values: selected,
+      reset: function () { chips.forEach(function (c) { c.classList.remove('on'); }); close(); syncBtn(); },
+      markBad: function () { btn.classList.add('bad'); open(); btn.scrollIntoView({ block: 'center' }); }
+    };
+  }
+  var gradesDd = makeDropdown('grades', GRADES, 'All grades, K–12', 'Grades');
+
+  function refresh() {
+    var list = load();
+    count.textContent = list.length + ' entered';
+    csv.value = toCsv(list);
+    var subject = 'Register to Win entries (' + list.length + ') - ' + EVENT;
+    mail.href = 'mailto:' + MAIL_TO + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(csv.value);
+  }
+  function syncStatus(msg) { var el = document.getElementById('sync'); if (el) el.textContent = msg || ''; }
+  function sync() {
+    if (syncing) return;
+    var list = load();
+    var pending = list.filter(function (r) { return !r.synced; });
+    if (pending.length === 0) { syncStatus(list.length ? 'All sent to seekingtoserve.com' : ''); return; }
+    if (!navigator.onLine) { syncStatus(pending.length + ' waiting to send (offline)'); return; }
+    syncing = true;
+    syncStatus('Sending ' + pending.length + '…');
+    var body = { source: 'ipad-kiosk-win', entries: pending.map(function (r) {
+      return { name: r.first + ' ' + r.last, school: r.school + ' (' + r.city + ')', grades: r.grades || [], subjects: ['Register to Win: ' + EVENT], email: r.email, signed_up: r.at };
+    }) };
+    fetch(SYNC_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+      .then(function (res) { if (!res.ok) throw new Error('HTTP ' + res.status); return res.json(); })
+      .then(function () {
+        var now = load(); var sentKeys = {};
+        pending.forEach(function (r) { sentKeys[r.email + '|' + r.at] = true; });
+        now.forEach(function (r) { if (sentKeys[r.email + '|' + r.at]) r.synced = true; });
+        save(now);
+        syncStatus('All sent to seekingtoserve.com');
+      })
+      .catch(function () { syncStatus(pending.length + ' waiting to send'); })
+      .then(function () { syncing = false; });
+  }
+  window.addEventListener('online', sync);
+  setInterval(sync, 5 * 60 * 1000);
+  function validEmail(s) { return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(s); }
+
+  form.addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    var first = firstEl.value.trim(), last = lastEl.value.trim(), school = schoolEl.value.trim(), city = cityEl.value.trim();
+    var email = emailEl.value.trim().toLowerCase();
+    [firstEl, lastEl, schoolEl, cityEl, emailEl].forEach(function (el) { el.classList.remove('bad'); });
+    hint.textContent = '';
+    if (!first) { firstEl.classList.add('bad'); hint.textContent = 'Please enter your first name.'; firstEl.focus(); return; }
+    if (!last) { lastEl.classList.add('bad'); hint.textContent = 'Please enter your last name.'; lastEl.focus(); return; }
+    if (!school) { schoolEl.classList.add('bad'); hint.textContent = 'Please enter your school.'; schoolEl.focus(); return; }
+    if (!city) { cityEl.classList.add('bad'); hint.textContent = 'Please enter the city your school is in.'; cityEl.focus(); return; }
+    var grades = gradesDd.values();
+    if (grades.length === 0) { hint.textContent = 'Please choose at least one grade.'; gradesDd.markBad(); return; }
+    if (!validEmail(email)) { emailEl.classList.add('bad'); hint.textContent = 'That email does not look right. Check it and try again.'; emailEl.focus(); return; }
+    var list = load();
+    list.push({ first: first, last: last, school: school, city: city, grades: grades, email: email, at: new Date().toISOString(), event: EVENT });
+    if (!save(list)) { hint.textContent = 'Could not save on this device. Tell Rocky.'; return; }
+    form.reset();
+    gradesDd.reset();
+    emailEl.blur();
+    sync();
+    refresh();
+    thanksTitle.textContent = "You're entered, " + first + '!';
+    form.hidden = true;
+    thanks.hidden = false;
+    window.scrollTo(0, 0);
+    clearTimeout(resetTimer);
+    resetTimer = setTimeout(backToForm, 15000);
+  });
+
+  function backToForm() { clearTimeout(resetTimer); thanks.hidden = true; form.hidden = false; }
+  document.getElementById('next').addEventListener('click', backToForm);
+
+  document.getElementById('toggle-admin').addEventListener('click', function () {
+    admin.hidden = !admin.hidden;
+    status.textContent = ''; document.getElementById('winner').textContent = '';
+    clearArmed = false; document.getElementById('clear').textContent = 'Clear list';
+    if (!admin.hidden) { refresh(); admin.scrollIntoView({ block: 'nearest' }); }
+  });
+  document.getElementById('copy').addEventListener('click', function () {
+    var text = csv.value;
+    var done = function () { status.textContent = 'Copied ' + load().length + ' rows. Paste into Numbers, Excel, or an email.'; };
+    var fallback = function () { csv.focus(); csv.select(); status.textContent = 'Text selected. Tap Copy.'; };
+    if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(text).then(done, fallback); } else { fallback(); }
+  });
+  document.getElementById('draw').addEventListener('click', function () {
+    var list = load();
+    if (!list.length) { status.textContent = 'No entries yet.'; return; }
+    var pick = list[Math.floor(Math.random() * list.length)];
+    document.getElementById('winner').textContent = '🎉 ' + pick.first + ' ' + pick.last + ' — ' + pick.school + ', ' + pick.city;
+    status.textContent = 'Drawn at random from ' + list.length + ' entries. Tap again to redraw.';
+  });
+  document.getElementById('clear').addEventListener('click', function () {
+    var btn = this;
+    if (!clearArmed) { clearArmed = true; btn.textContent = 'Tap again to erase ' + load().length + ' rows'; status.textContent = 'Copy or email the list first. This cannot be undone.'; return; }
+    save([]); clearArmed = false; btn.textContent = 'Clear list'; status.textContent = 'List cleared.'; refresh();
+  });
+
+  refresh();
+  sync();
+})();
+</script>
+</body>
+</html>
