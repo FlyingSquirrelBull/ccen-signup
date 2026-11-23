@@ -74,7 +74,7 @@
     font-family: -apple-system, "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-size: 14px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-soft);
   }
-  input[type="text"], input[type="email"] {
+  input[type="text"], input[type="email"], input[type="tel"] {
     font: inherit; font-size: 24px; padding: 14px 18px; border: 1.5px solid var(--rule); border-radius: 6px;
     background: var(--white); color: var(--ink); width: 100%;
   }
@@ -177,7 +177,7 @@
     .row2 { gap: 12px; }
     .field { gap: 5px; }
     label { font-size: 13px; }
-    input[type="text"], input[type="email"] { font-size: 22px; padding: 12px 14px; }
+    input[type="text"], input[type="email"], input[type="tel"] { font-size: 22px; padding: 12px 14px; }
     .dd-btn { font-size: 22px; padding: 12px 44px 12px 14px; }
     .hint { min-height: 16px; font-size: 14px; }
     .go { font-size: 28px; padding: 18px; margin-top: 0; }
@@ -240,17 +240,23 @@
         <div class="dd-panel" id="grades-panel" hidden></div>
       </div>
     </div>
-    <div class="field">
-      <label for="email">Email (so we can reach the winner)</label>
-      <input type="email" id="email" inputmode="email" autocapitalize="none" autocorrect="off" spellcheck="false" enterkeyhint="done">
-      <div class="hint" id="hint"></div>
+    <div class="row2">
+      <div class="field">
+        <label for="email">Email</label>
+        <input type="email" id="email" inputmode="email" autocapitalize="none" autocorrect="off" spellcheck="false" enterkeyhint="next">
+      </div>
+      <div class="field">
+        <label for="phone">Cell phone (for texts)</label>
+        <input type="tel" id="phone" inputmode="tel" autocorrect="off" spellcheck="false" enterkeyhint="done" placeholder="(555) 555-5555">
+      </div>
     </div>
+    <div class="hint" id="hint"></div>
     <button type="submit" class="go" id="go">Enter me to win</button>
   </form>
 
   <section class="thanks" id="thanks" hidden>
     <h2 id="thanks-title">You're entered!</h2>
-    <p>Good luck in the drawing! Winners will be notified by email.</p>
+    <p>Good luck in the drawing! Winners will be notified by text and email.</p>
     <div class="gift">Show this screen to pick up your free gift 🎁</div>
     <button type="button" id="next">Next person</button>
   </section>
@@ -296,6 +302,10 @@
   var schoolEl = document.getElementById('school');
   var cityEl = document.getElementById('city');
   var emailEl = document.getElementById('email');
+  var phoneEl = document.getElementById('phone');
+  function digits(s) { var d = String(s).replace(/\D/g, ''); if (d.length === 11 && d[0] === '1') d = d.slice(1); return d; }
+  function fmtPhone(d) { return d.length === 10 ? '(' + d.slice(0, 3) + ') ' + d.slice(3, 6) + '-' + d.slice(6) : d; }
+  phoneEl.addEventListener('blur', function () { var d = digits(phoneEl.value); if (d.length === 10) phoneEl.value = fmtPhone(d); });
   var hint = document.getElementById('hint');
   var thanks = document.getElementById('thanks');
   var thanksTitle = document.getElementById('thanks-title');
@@ -311,9 +321,9 @@
   function save(list) { try { localStorage.setItem(KEY, JSON.stringify(list)); return true; } catch (e) { return false; } }
   function q(s) { return '"' + String(s == null ? '' : s).replace(/"/g, '""') + '"'; }
   function toCsv(list) {
-    var lines = ['first_name,last_name,role,school,city,grades,email,entered,event'];
+    var lines = ['first_name,last_name,role,school,city,grades,email,phone,entered,event'];
     list.forEach(function (r) {
-      lines.push([q(r.first), q(r.last), q(r.role), q(r.school), q(r.city), q((r.grades || []).join('; ')), q(r.email), q(r.at), q(r.event)].join(','));
+      lines.push([q(r.first), q(r.last), q(r.role), q(r.school), q(r.city), q((r.grades || []).join('; ')), q(r.email), q(r.phone), q(r.at), q(r.event)].join(','));
     });
     return lines.join('\n');
   }
@@ -376,7 +386,7 @@
     ev.preventDefault();
     var first = firstEl.value.trim(), last = lastEl.value.trim(), school = schoolEl.value.trim(), city = cityEl.value.trim();
     var email = emailEl.value.trim().toLowerCase();
-    [firstEl, lastEl, schoolEl, cityEl, emailEl].forEach(function (el) { el.classList.remove('bad'); });
+    [firstEl, lastEl, schoolEl, cityEl, emailEl, phoneEl].forEach(function (el) { el.classList.remove('bad'); });
     hint.textContent = '';
     if (!first) { firstEl.classList.add('bad'); hint.textContent = 'Please enter your first name.'; firstEl.focus(); return; }
     if (!last) { lastEl.classList.add('bad'); hint.textContent = 'Please enter your last name.'; lastEl.focus(); return; }
@@ -387,13 +397,15 @@
     var grades = gradesDd.values();
     if (grades.length === 0) { hint.textContent = 'Please choose at least one grade.'; gradesDd.markBad(); return; }
     if (!validEmail(email)) { emailEl.classList.add('bad'); hint.textContent = 'That email does not look right. Check it and try again.'; emailEl.focus(); return; }
+    var phoneD = digits(phoneEl.value);
+    if (phoneD.length !== 10) { phoneEl.classList.add('bad'); hint.textContent = 'Please enter a 10-digit cell number.'; phoneEl.focus(); return; }
     var list = load();
-    list.push({ first: first, last: last, role: role, school: school, city: city, grades: grades, email: email, at: new Date().toISOString(), event: EVENT });
+    list.push({ first: first, last: last, role: role, school: school, city: city, grades: grades, email: email, phone: fmtPhone(phoneD), at: new Date().toISOString(), event: EVENT });
     if (!save(list)) { hint.textContent = 'Could not save on this device. Tell Rocky.'; return; }
     form.reset();
     gradesDd.reset();
     roleReset();
-    emailEl.blur();
+    emailEl.blur(); phoneEl.blur();
     sync();
     refresh();
     thanksTitle.textContent = "You're entered, " + first + '!';
@@ -425,7 +437,7 @@
     // one entry per email, so nobody wins twice
     var seen = {}, pool = list.filter(function (r) { if (seen[r.email]) return false; seen[r.email] = 1; return true; });
     var i = Math.floor(Math.random() * pool.length), g = pool[i];
-    var line = function (label, p) { return label + ': ' + p.first + ' ' + p.last + ' — ' + p.school + ', ' + p.city; };
+    var line = function (label, p) { return label + ': ' + p.first + ' ' + p.last + ' — ' + p.school + ', ' + p.city + (p.phone ? ' — ' + p.phone : ''); };
     var out = '🍕 ' + line('Grand prize', g);
     if (pool.length > 1) {
       var rest = pool.slice(0, i).concat(pool.slice(i + 1));
