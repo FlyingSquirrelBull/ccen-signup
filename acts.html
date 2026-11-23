@@ -196,7 +196,7 @@
   .attract .today { display: inline-block; margin-top: 1vh; background: #fff; color: #93328e; border-radius: 14px; padding: 0.1em 0.5em; }
   .attract .sub { font-size: clamp(18px, min(3.6vw, 4vh), 34px); font-weight: 700; color: #ffe9a8; }
   .attract .tap { font-size: clamp(16px, min(2.8vw, 3.2vh), 26px); opacity: 0.9; }
-  .attract.flash { animation: flash 1s steps(1) 3; }
+  .attract.flash { animation: flash 1s steps(1) 6; }
   @keyframes flash { 0% { background: #93328e; color: #fff; } 50% { background: #4bc1eb; color: #fff; } }
   .count:empty { display: none; }
   @media (prefers-reduced-motion: no-preference) {
@@ -291,7 +291,8 @@
     </div>
     <div class="winner" id="winner"></div>
     <div class="status" id="status"></div>
-    <div class="offline">This list lives only on this iPad. Email it to yourself at the end of each day.</div>
+    <div class="offline" id="cloud"></div>
+    <div class="offline">Every entry also stays on this iPad.</div>
   </section>
 
   <footer class="foot">
@@ -394,12 +395,50 @@
   function refresh() {
     var list = load();
     count.textContent = '';
-    document.getElementById('admin-title').textContent = list.length + ' entries (stored on this iPad only)';
+    document.getElementById('admin-title').textContent = list.length + ' entries';
     csv.value = toCsv(list);
     var subject = 'Register to Win entries (' + list.length + ') - ' + EVENT;
     mail.href = 'mailto:' + MAIL_TO + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(csv.value);
   }
-  function sync() {}
+  // Cloud copy: each entry is posted to a Google Form (responses -> Rocky's Google Sheet).
+  // Entries stay on the iPad too; ids of sent entries are remembered so nothing is sent twice.
+  var FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSdI7nnVXShzX9-eILx_sgq1E5b95BJkIi7eqf4Bdn3Zi3d66g/formResponse';
+  var F = { first: 637796348, last: 1428754780, role: 1972332908, school: 1572158522, city: 1532094605, grades: 970492736,
+            email: 76376903, phone: 1386825125, at: 38510012, event: 388503983, id: 315507947 };
+  var SENT_KEY = KEY + '-sent', syncing = false;
+  function sentIds() { try { return JSON.parse(localStorage.getItem(SENT_KEY) || '{}'); } catch (e) { return {}; } }
+  function ensureIds() {
+    var list = load(), changed = false;
+    list.forEach(function (r) { if (!r.id) { r.id = (r.at || '') + '-' + Math.random().toString(36).slice(2, 8); changed = true; } });
+    if (changed) save(list);
+    return list;
+  }
+  function syncNote() {
+    var el = document.getElementById('cloud'); if (!el) return;
+    var sent = sentIds(), list = load(), waiting = list.filter(function (r) { return !sent[r.id]; }).length;
+    el.textContent = waiting ? waiting + ' waiting to send to the Google Sheet (sends automatically when online)' : 'All ' + list.length + ' entries sent to the Google Sheet ✓';
+  }
+  function sync() {
+    if (syncing) return;
+    var list = ensureIds(), sent = sentIds();
+    var todo = list.filter(function (r) { return !sent[r.id]; });
+    if (!todo.length || !window.fetch) { syncNote(); return; }
+    syncing = true;
+    var next = function () {
+      var r = todo.shift();
+      if (!r) { syncing = false; syncNote(); return; }
+      var body = new URLSearchParams();
+      var vals = { first: r.first, last: r.last, role: r.role, school: r.school, city: r.city, grades: (r.grades || []).join('; '),
+                   email: r.email, phone: r.phone, at: r.at, event: r.event, id: r.id };
+      Object.keys(F).forEach(function (k) { body.append('entry.' + F[k], vals[k] == null ? '' : String(vals[k])); });
+      fetch(FORM_URL, { method: 'POST', mode: 'no-cors', body: body }).then(function () {
+        var s2 = sentIds(); s2[r.id] = 1; localStorage.setItem(SENT_KEY, JSON.stringify(s2)); next();
+      }, function () { syncing = false; syncNote(); });
+    };
+    next();
+  }
+  window.addEventListener('online', sync);
+  setInterval(sync, 60000);
   function validEmail(s) { return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(s); }
 
   form.addEventListener('submit', function (ev) {
@@ -420,7 +459,7 @@
     var phoneD = digits(phoneEl.value);
     if (phoneD.length !== 10) { phoneEl.classList.add('bad'); hint.textContent = 'Please enter a 10-digit cell number.'; phoneEl.focus(); return; }
     var list = load();
-    list.push({ first: first, last: last, role: role, school: school, city: city, grades: grades, email: email, phone: fmtPhone(phoneD), at: new Date().toISOString(), event: EVENT });
+    list.push({ id: Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8), first: first, last: last, role: role, school: school, city: city, grades: grades, email: email, phone: fmtPhone(phoneD), at: new Date().toISOString(), event: EVENT });
     if (!save(list)) { hint.textContent = 'Could not save on this device. Tell Rocky.'; return; }
     form.reset();
     gradesDd.reset();
@@ -442,7 +481,7 @@
   // Any touch stops it; it restarts after an entry, or after 60s of nobody touching the form.
   var attract = document.getElementById('attract');
   var attractOn = false, attractTimer = null, idleTimer = null;
-  var FLASH_MS = 3000, FORM_MS = 4000, IDLE_MS = 60000;
+  var FLASH_MS = 6000, FORM_MS = 2000, IDLE_MS = 60000;
   function showPizza() {
     if (!attractOn) return;
     attract.hidden = false; attract.classList.remove('flash'); void attract.offsetWidth; attract.classList.add('flash');
@@ -481,7 +520,7 @@
     admin.hidden = !admin.hidden;
     status.textContent = ''; document.getElementById('winner').textContent = '';
     clearArmed = false; document.getElementById('clear').textContent = 'Clear list';
-    if (!admin.hidden) { stopAttract(); refresh(); admin.scrollIntoView({ block: 'nearest' }); }
+    if (!admin.hidden) { stopAttract(); refresh(); syncNote(); admin.scrollIntoView({ block: 'nearest' }); }
   });
   document.getElementById('copy').addEventListener('click', function () {
     var text = csv.value;
