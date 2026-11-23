@@ -186,6 +186,19 @@
     .admin, .foot { grid-column: 1 / -1; }
     .foot { padding-top: 6px; }
   }
+  /* attract screen */
+  .attract { position: fixed; inset: 0; z-index: 50; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2vh;
+    text-align: center; padding: 6vw; background: #93328e; color: #fff; cursor: pointer; -webkit-user-select: none; user-select: none;
+    font-family: -apple-system, "Helvetica Neue", Helvetica, Arial, sans-serif; }
+  .attract[hidden] { display: none; }
+  .attract .big { font-size: clamp(40px, min(11vw, 12vh), 120px); font-weight: 900; line-height: 1.02; text-transform: uppercase; letter-spacing: 0.01em; }
+  .attract .em { font-size: clamp(48px, min(14vw, 13vh), 150px); line-height: 1; }
+  .attract .today { display: inline-block; margin-top: 1vh; background: #fff; color: #93328e; border-radius: 14px; padding: 0.1em 0.5em; }
+  .attract .sub { font-size: clamp(18px, min(3.6vw, 4vh), 34px); font-weight: 700; color: #ffe9a8; }
+  .attract .tap { font-size: clamp(16px, min(2.8vw, 3.2vh), 26px); opacity: 0.9; }
+  .attract.flash { animation: flash 1s steps(1) 3; }
+  @keyframes flash { 0% { background: #93328e; color: #fff; } 50% { background: #4bc1eb; color: #fff; } }
+  .count:empty { display: none; }
   @media (prefers-reduced-motion: no-preference) {
     .thanks { animation: pop 240ms ease-out; }
     @keyframes pop { from { transform: scale(0.97); opacity: 0.4; } to { transform: none; opacity: 1; } }
@@ -193,6 +206,12 @@
 </style>
 </head>
 <body>
+<div class="attract" id="attract" hidden aria-label="Tap to enter">
+  <div class="em">🍕</div>
+  <div class="big">Class Pizza Party<br>Giveaway <span class="today">Today!</span></div>
+  <div class="sub">+ $100 Abeka credit · Everyone who enters gets a free gift</div>
+  <div class="tap">Tap anywhere to enter</div>
+</div>
 <main class="sheet">
   <div class="lead">
   <header class="banner">
@@ -262,7 +281,7 @@
   </section>
 
   <section class="admin" id="admin" hidden>
-    <h3>Entries (stored on this iPad only)</h3>
+    <h3 id="admin-title">Entries (stored on this iPad only)</h3>
     <textarea id="csv" readonly spellcheck="false"></textarea>
     <div class="row">
       <button type="button" id="copy">Copy list</button>
@@ -374,7 +393,8 @@
 
   function refresh() {
     var list = load();
-    count.textContent = list.length + ' entered \u00b7 stored on this iPad only';
+    count.textContent = '';
+    document.getElementById('admin-title').textContent = list.length + ' entries (stored on this iPad only)';
     csv.value = toCsv(list);
     var subject = 'Register to Win entries (' + list.length + ') - ' + EVENT;
     mail.href = 'mailto:' + MAIL_TO + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(csv.value);
@@ -412,18 +432,56 @@
     form.hidden = true;
     thanks.hidden = false;
     window.scrollTo(0, 0);
-    clearTimeout(resetTimer);
+    clearTimeout(resetTimer); clearTimeout(idleTimer);
     resetTimer = setTimeout(backToForm, 15000);
   });
 
-  function backToForm() { clearTimeout(resetTimer); thanks.hidden = true; form.hidden = false; }
+  function backToForm() { clearTimeout(resetTimer); thanks.hidden = true; form.hidden = false; startAttract(); }
+
+  // Attract loop: flash the pizza screen 3 times, show the entry screen, repeat.
+  // Any touch stops it; it restarts after an entry, or after 60s of nobody touching the form.
+  var attract = document.getElementById('attract');
+  var attractOn = false, attractTimer = null, idleTimer = null;
+  var FLASH_MS = 3000, FORM_MS = 4000, IDLE_MS = 60000;
+  function showPizza() {
+    if (!attractOn) return;
+    attract.hidden = false; attract.classList.remove('flash'); void attract.offsetWidth; attract.classList.add('flash');
+    attractTimer = setTimeout(showForm, FLASH_MS);
+  }
+  function showForm() {
+    if (!attractOn) return;
+    attract.hidden = true;
+    attractTimer = setTimeout(showPizza, FORM_MS);
+  }
+  function startAttract() {
+    clearTimeout(idleTimer); clearTimeout(attractTimer);
+    if (!admin.hidden || form.hidden) return;
+    attractOn = true; window.scrollTo(0, 0); showPizza();
+  }
+  function stopAttract() { attractOn = false; clearTimeout(attractTimer); attract.hidden = true; }
+  function clearForm() {
+    form.reset(); gradesDd.reset(); roleReset(); hint.textContent = '';
+    [firstEl, lastEl, schoolEl, cityEl, emailEl, phoneEl].forEach(function (el) { el.classList.remove('bad'); el.blur(); });
+  }
+  function touched(ev) {
+    if (attractOn) {
+      stopAttract();
+      if (ev && ev.target === attract || (ev && attract.contains(ev.target))) { ev.preventDefault(); }
+    }
+    clearTimeout(idleTimer);
+    idleTimer = setTimeout(function () { if (!form.hidden && admin.hidden) { clearForm(); startAttract(); } }, IDLE_MS);
+  }
+  document.addEventListener('pointerdown', touched, true);
+  document.addEventListener('touchstart', touched, { capture: true, passive: true });
+  document.addEventListener('keydown', touched, true);
+  attract.addEventListener('click', function (ev) { ev.preventDefault(); ev.stopPropagation(); });
   document.getElementById('next').addEventListener('click', backToForm);
 
   document.getElementById('toggle-admin').addEventListener('click', function () {
     admin.hidden = !admin.hidden;
     status.textContent = ''; document.getElementById('winner').textContent = '';
     clearArmed = false; document.getElementById('clear').textContent = 'Clear list';
-    if (!admin.hidden) { refresh(); admin.scrollIntoView({ block: 'nearest' }); }
+    if (!admin.hidden) { stopAttract(); refresh(); admin.scrollIntoView({ block: 'nearest' }); }
   });
   document.getElementById('copy').addEventListener('click', function () {
     var text = csv.value;
@@ -454,6 +512,7 @@
 
   refresh();
   sync();
+  startAttract();
 })();
 </script>
 </body>
